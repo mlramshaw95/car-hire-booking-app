@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DriveNow | Car Hire App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="auth-screen" class="auth-screen active">
+      <div class="auth-card">
+        <div class="brand-wrap">
+          <div class="brand-mark">D</div>
+          <div>
+            <p class="eyebrow">Fleet booking</p>
+            <h1>DriveNow</h1>
+          </div>
+        </div>
+
+        <div class="auth-toggle">
+          <button class="toggle-button active" data-mode="login" type="button">Login</button>
+          <button class="toggle-button" data-mode="signup" type="button">Sign up</button>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <label>
+            Email
+            <input type="email" name="email" placeholder="you@example.com" value="admin@drive.now" required />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" placeholder="••••••••" value="admin123" required />
+          </label>
+          <button class="primary-btn" type="submit">Login</button>
+        </form>
+
+        <form id="signup-form" class="auth-form hidden">
+          <label>
+            Full name
+            <input type="text" name="name" placeholder="Your name" required />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" placeholder="Create a password" required />
+          </label>
+          <button class="primary-btn" type="submit">Create account</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="app-shell" class="app-shell hidden">
+      <div class="phone-frame">
+        <header class="app-header">
+          <div>
+            <p class="eyebrow">Welcome back</p>
+            <h1 id="header-name">DriveNow</h1>
+          </div>
+          <button id="logout-btn" class="logout-btn" type="button">Log out</button>
+        </header>
+
+        <nav class="top-tabs" aria-label="Vehicle groups">
+          <button class="tab active" type="button">Popular</button>
+          <button class="tab" type="button">SUV</button>
+          <button class="tab" type="button">Luxury</button>
+          <button class="tab" type="button">Electric</button>
+        </nav>
+
+        <section class="search-box">
+          <div class="search-icon">⌕</div>
+          <input id="search-input" type="text" placeholder="Search cars, airport, city" />
+        </section>
+
+        <main class="screen active" data-screen="home">
+          <section class="promo-card">
+            <div>
+              <p class="promo-tag">Special offer</p>
+              <h2>Save 20% on 3+ day bookings</h2>
+            </div>
+            <button class="promo-btn" type="button">Book now</button>
+          </section>
+
+          <section class="section-header">
+            <h3>Recommended</h3>
+            <button class="text-btn" type="button">View all</button>
+          </section>
+
+          <div id="vehicle-list" class="vehicle-list"></div>
+        </main>
+
+        <main class="screen" data-screen="bookings">
+          <section class="section-header compact">
+            <h3>Your trips</h3>
+            <button class="text-btn" type="button">History</button>
+          </section>
+          <div id="booking-list" class="booking-list"></div>
+        </main>
+
+        <main class="screen" data-screen="favorites">
+          <section class="section-header compact">
+            <h3>Saved vehicles</h3>
+            <button class="text-btn" type="button">Edit</button>
+          </section>
+          <div class="saved-list">
+            <div class="saved-item">
+              <div class="saved-icon">🚙</div>
+              <div>
+                <strong>BMW X5</strong>
+                <span>Available today</span>
+              </div>
+              <button class="small-btn" type="button">Book</button>
+            </div>
+            <div class="saved-item">
+              <div class="saved-icon">⚡</div>
+              <div>
+                <strong>Tesla Model 3</strong>
+                <span>Fast charge included</span>
+              </div>
+              <button class="small-btn" type="button">Book</button>
+            </div>
+          </div>
+        </main>
+
+        <main class="screen" data-screen="profile">
+          <div class="profile-card">
+            <div class="profile-header">
+              <div class="profile-avatar">JD</div>
+              <div>
+                <h3 id="profile-name">Jordan Doe</h3>
+                <span id="profile-role">Gold member</span>
+              </div>
+            </div>
+
+            <div class="profile-stats">
+              <div><strong id="stat-trips">24</strong><span>Trips</span></div>
+              <div><strong id="stat-rating">4.9</strong><span>Rating</span></div>
+              <div><strong id="stat-spend">£2.3k</strong><span>Spent</span></div>
+            </div>
+          </div>
+
+          <div class="settings-list">
+            <button class="setting-item" type="button">Driver details</button>
+            <button class="setting-item" type="button">Payment methods</button>
+            <button class="setting-item" type="button">Insurance cover</button>
+            <button class="setting-item" type="button">Support</button>
+          </div>
+        </main>
+
+        <main class="screen" data-screen="admin">
+          <div class="admin-panel">
+            <div class="section-header compact">
+              <h3>Admin dashboard</h3>
+            </div>
+
+            <div class="admin-metrics">
+              <div class="metric-card">
+                <span>Total revenue</span>
+                <strong id="metric-revenue">£0</strong>
+              </div>
+              <div class="metric-card">
+                <span>Active users</span>
+                <strong id="metric-users">0</strong>
+              </div>
+              <div class="metric-card">
+                <span>Upcoming</span>
+                <strong id="metric-upcoming">0</strong>
+              </div>
+            </div>
+
+            <div class="admin-list">
+              <h4>Recent bookings</h4>
+              <div id="admin-booking-list"></div>
+            </div>
+          </div>
+        </main>
+
+        <footer class="bottom-nav" aria-label="Main app navigation">
+          <button class="nav-button active" type="button" data-target="home">
+            <span>⌂</span>
+            Home
+          </button>
+          <button class="nav-button" type="button" data-target="bookings">
+            <span>🗓</span>
+            Trips
+          </button>
+          <button class="nav-button" type="button" data-target="favorites">
+            <span>♥</span>
+            Saved
+          </button>
+          <button class="nav-button" type="button" data-target="profile">
+            <span>👤</span>
+            Profile
+          </button>
+          <button id="admin-nav-btn" class="nav-button admin-only hidden" type="button" data-target="admin">
+            <span>📊</span>
+            Admin
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <div id="checkout-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card">
+        <button id="close-modal" class="close-btn" type="button" aria-label="Close checkout">×</button>
+        <p class="eyebrow">Checkout</p>
+        <h3>Reserve vehicle</h3>
+
+        <div class="checkout-details">
+          <div>
+            <span>Pickup</span>
+            <strong id="modal-pickup">Manchester Airport</strong>
+          </div>
+          <div>
+            <span>Dates</span>
+            <strong id="modal-dates">17 Sep - 21 Sep</strong>
+          </div>
+          <div>
+            <span>Total</span>
+            <strong id="modal-total">£392</strong>
+          </div>
+        </div>
+
+        <form id="booking-form">
+          <label>
+            Full name
+            <input name="fullName" type="text" placeholder="Your name" required />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Driver licence
+            <input name="licence" type="text" placeholder="MANC-234-789" required />
+          </label>
+          <button class="cta-btn" type="submit">Pay deposit</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
