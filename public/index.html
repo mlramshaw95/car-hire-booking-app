@@ -1,249 +1,334 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DriveNow | Car Hire App</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div id="auth-screen" class="auth-screen active">
-      <div class="auth-card">
-        <div class="brand-wrap">
-          <div class="brand-mark">D</div>
-          <div>
-            <p class="eyebrow">Fleet booking</p>
-            <h1>DriveNow</h1>
-          </div>
-        </div>
+const express = require('express');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+const path = require('path');
 
-        <div class="auth-toggle">
-          <button class="toggle-button active" data-mode="login" type="button">Login</button>
-          <button class="toggle-button" data-mode="signup" type="button">Sign up</button>
-        </div>
+const app = express();
+const port = Number(process.env.PORT || 3000);
+const dataDir = path.join(__dirname, 'data');
+const dbPath = path.join(dataDir, 'drive-now.db');
 
-        <form id="login-form" class="auth-form">
-          <label>
-            Email
-            <input type="email" name="email" placeholder="you@example.com" value="admin@drive.now" required />
-          </label>
-          <label>
-            Password
-            <input type="password" name="password" placeholder="••••••••" value="admin123" required />
-          </label>
-          <button class="primary-btn" type="submit">Login</button>
-        </form>
+fs.mkdirSync(dataDir, { recursive: true });
 
-        <form id="signup-form" class="auth-form hidden">
-          <label>
-            Full name
-            <input type="text" name="name" placeholder="Your name" required />
-          </label>
-          <label>
-            Email
-            <input type="email" name="email" placeholder="you@example.com" required />
-          </label>
-          <label>
-            Password
-            <input type="password" name="password" placeholder="Create a password" required />
-          </label>
-          <button class="primary-btn" type="submit">Create account</button>
-        </form>
-      </div>
-    </div>
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Failed to connect to SQLite database:', err.message);
+    process.exit(1);
+  }
+  console.log('Connected to SQLite database');
+});
 
-    <div id="app-shell" class="app-shell hidden">
-      <div class="phone-frame">
-        <header class="app-header">
-          <div>
-            <p class="eyebrow">Welcome back</p>
-            <h1 id="header-name">DriveNow</h1>
-          </div>
-          <button id="logout-btn" class="logout-btn" type="button">Log out</button>
-        </header>
+function run(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function onRun(err) {
+      if (err) return reject(err);
+      resolve({ id: this.lastID, changes: this.changes });
+    });
+  });
+}
 
-        <nav class="top-tabs" aria-label="Vehicle groups">
-          <button class="tab active" type="button">Popular</button>
-          <button class="tab" type="button">SUV</button>
-          <button class="tab" type="button">Luxury</button>
-          <button class="tab" type="button">Electric</button>
-        </nav>
+function all(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+}
 
-        <section class="search-box">
-          <div class="search-icon">⌕</div>
-          <input id="search-input" type="text" placeholder="Search cars, airport, city" />
-        </section>
+function get(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) return reject(err);
+      resolve(row);
+    });
+  });
+}
 
-        <main class="screen active" data-screen="home">
-          <section class="promo-card">
-            <div>
-              <p class="promo-tag">Special offer</p>
-              <h2>Save 20% on 3+ day bookings</h2>
-            </div>
-            <button class="promo-btn" type="button">Book now</button>
-          </section>
+function sanitizeUser(user) {
+  return user ? { id: user.id, name: user.name, email: user.email, role: user.role } : null;
+}
 
-          <section class="section-header">
-            <h3>Recommended</h3>
-            <button class="text-btn" type="button">View all</button>
-          </section>
+function requireAuth(req, res, next) {
+  if (req.session.user) return next();
+  return res.status(401).json({ message: 'Please log in first.' });
+}
 
-          <div id="vehicle-list" class="vehicle-list"></div>
-        </main>
+function requireAdmin(req, res, next) {
+  if (req.session.user && req.session.user.role === 'admin') return next();
+  return res.status(403).json({ message: 'Admin access required.' });
+}
 
-        <main class="screen" data-screen="bookings">
-          <section class="section-header compact">
-            <h3>Your trips</h3>
-            <button class="text-btn" type="button">History</button>
-          </section>
-          <div id="booking-list" class="booking-list"></div>
-        </main>
+async function initializeDatabase() {
+  await run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'user'
+    )
+  `);
 
-        <main class="screen" data-screen="favorites">
-          <section class="section-header compact">
-            <h3>Saved vehicles</h3>
-            <button class="text-btn" type="button">Edit</button>
-          </section>
-          <div class="saved-list">
-            <div class="saved-item">
-              <div class="saved-icon">🚙</div>
-              <div>
-                <strong>BMW X5</strong>
-                <span>Available today</span>
-              </div>
-              <button class="small-btn" type="button">Book</button>
-            </div>
-            <div class="saved-item">
-              <div class="saved-icon">⚡</div>
-              <div>
-                <strong>Tesla Model 3</strong>
-                <span>Fast charge included</span>
-              </div>
-              <button class="small-btn" type="button">Book</button>
-            </div>
-          </div>
-        </main>
+  await run(`
+    CREATE TABLE IF NOT EXISTS vehicles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      fuel TEXT NOT NULL,
+      seats INTEGER NOT NULL,
+      rate REAL NOT NULL,
+      icon TEXT NOT NULL,
+      badge TEXT NOT NULL
+    )
+  `);
 
-        <main class="screen" data-screen="profile">
-          <div class="profile-card">
-            <div class="profile-header">
-              <div class="profile-avatar">JD</div>
-              <div>
-                <h3 id="profile-name">Jordan Doe</h3>
-                <span id="profile-role">Gold member</span>
-              </div>
-            </div>
+  await run(`
+    CREATE TABLE IF NOT EXISTS bookings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      vehicle_id INTEGER NOT NULL,
+      pickup_date TEXT NOT NULL,
+      return_date TEXT NOT NULL,
+      total REAL NOT NULL,
+      status TEXT NOT NULL DEFAULT 'Upcoming',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+    )
+  `);
 
-            <div class="profile-stats">
-              <div><strong id="stat-trips">24</strong><span>Trips</span></div>
-              <div><strong id="stat-rating">4.9</strong><span>Rating</span></div>
-              <div><strong id="stat-spend">£2.3k</strong><span>Spent</span></div>
-            </div>
-          </div>
+  await run(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      booking_id INTEGER NOT NULL,
+      amount REAL NOT NULL,
+      status TEXT NOT NULL DEFAULT 'Paid',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (booking_id) REFERENCES bookings(id)
+    )
+  `);
 
-          <div class="settings-list">
-            <button class="setting-item" type="button">Driver details</button>
-            <button class="setting-item" type="button">Payment methods</button>
-            <button class="setting-item" type="button">Insurance cover</button>
-            <button class="setting-item" type="button">Support</button>
-          </div>
-        </main>
+  const vehicleCount = await get('SELECT COUNT(*) AS count FROM vehicles');
+  if (!vehicleCount || Number(vehicleCount.count) === 0) {
+    await run(`
+      INSERT INTO vehicles (name, type, fuel, seats, rate, icon, badge)
+      VALUES
+        ('BMW X5', 'SUV', 'Hybrid', 5, 98, '🚙', 'Popular'),
+        ('Mercedes C-Class', 'Luxury', 'Diesel', 4, 112, '🏎️', 'Luxury'),
+        ('Tesla Model 3', 'Electric', 'Electric', 5, 89, '⚡', 'Eco'),
+        ('VW Touran', 'Family', 'Petrol', 7, 74, '🚐', 'Family')
+    `);
+  }
 
-        <main class="screen" data-screen="admin">
-          <div class="admin-panel">
-            <div class="section-header compact">
-              <h3>Admin dashboard</h3>
-            </div>
+  const adminUser = await get('SELECT * FROM users WHERE email = ?', ['admin@drive.now']);
+  if (!adminUser) {
+    const passwordHash = await bcrypt.hash('admin123', 10);
+    await run(
+      'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+      ['Admin User', 'admin@drive.now', passwordHash, 'admin']
+    );
+  }
+}
 
-            <div class="admin-metrics">
-              <div class="metric-card">
-                <span>Total revenue</span>
-                <strong id="metric-revenue">£0</strong>
-              </div>
-              <div class="metric-card">
-                <span>Active users</span>
-                <strong id="metric-users">0</strong>
-              </div>
-              <div class="metric-card">
-                <span>Upcoming</span>
-                <strong id="metric-upcoming">0</strong>
-              </div>
-            </div>
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'drive-now-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,
+    maxAge: 12 * 60 * 60 * 1000
+  }
+}));
 
-            <div class="admin-list">
-              <h4>Recent bookings</h4>
-              <div id="admin-booking-list"></div>
-            </div>
-          </div>
-        </main>
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, timestamp: new Date().toISOString() });
+});
 
-        <footer class="bottom-nav" aria-label="Main app navigation">
-          <button class="nav-button active" type="button" data-target="home">
-            <span>⌂</span>
-            Home
-          </button>
-          <button class="nav-button" type="button" data-target="bookings">
-            <span>🗓</span>
-            Trips
-          </button>
-          <button class="nav-button" type="button" data-target="favorites">
-            <span>♥</span>
-            Saved
-          </button>
-          <button class="nav-button" type="button" data-target="profile">
-            <span>👤</span>
-            Profile
-          </button>
-          <button id="admin-nav-btn" class="nav-button admin-only hidden" type="button" data-target="admin">
-            <span>📊</span>
-            Admin
-          </button>
-        </footer>
-      </div>
-    </div>
+app.get('/api/auth/me', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Not logged in.' });
+  }
+  return res.json({ user: req.session.user });
+});
 
-    <div id="checkout-modal" class="modal hidden" aria-hidden="true">
-      <div class="modal-card">
-        <button id="close-modal" class="close-btn" type="button" aria-label="Close checkout">×</button>
-        <p class="eyebrow">Checkout</p>
-        <h3>Reserve vehicle</h3>
+app.post('/api/auth/signup', async (req, res) => {
+  const name = String(req.body.name || '').trim();
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
 
-        <div class="checkout-details">
-          <div>
-            <span>Pickup</span>
-            <strong id="modal-pickup">Manchester Airport</strong>
-          </div>
-          <div>
-            <span>Dates</span>
-            <strong id="modal-dates">17 Sep - 21 Sep</strong>
-          </div>
-          <div>
-            <span>Total</span>
-            <strong id="modal-total">£392</strong>
-          </div>
-        </div>
+  if (!name || !email || password.length < 6) {
+    return res.status(400).json({ message: 'Name, email, and password (6+ chars) are required.' });
+  }
 
-        <form id="booking-form">
-          <label>
-            Full name
-            <input name="fullName" type="text" placeholder="Your name" required />
-          </label>
-          <label>
-            Email
-            <input name="email" type="email" placeholder="you@example.com" required />
-          </label>
-          <label>
-            Driver licence
-            <input name="licence" type="text" placeholder="MANC-234-789" required />
-          </label>
-          <button class="cta-btn" type="submit">Pay deposit</button>
-        </form>
-      </div>
-    </div>
+  try {
+    const existing = await get('SELECT * FROM users WHERE email = ?', [email]);
+    if (existing) {
+      return res.status(409).json({ message: 'An account with that email already exists.' });
+    }
 
-    <script src="script.js"></script>
-  </body>
-</html>
+    const hash = await bcrypt.hash(password, 10);
+    const result = await run('INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)', [name, email, hash, 'user']);
+    const user = await get('SELECT id, name, email, role FROM users WHERE id = ?', [result.id]);
+    req.session.user = sanitizeUser(user);
+    return res.status(201).json({ user: req.session.user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Unable to create account.' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+
+  try {
+    const user = await get('SELECT * FROM users WHERE email = ?', [email]);
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) {
+      return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    req.session.user = sanitizeUser(user);
+    return res.json({ user: req.session.user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Login failed.' });
+  }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.json({ message: 'Logged out successfully.' });
+  });
+});
+
+app.get('/api/vehicles', async (req, res) => {
+  try {
+    const vehicles = await all('SELECT * FROM vehicles ORDER BY id');
+    res.json(vehicles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to load vehicles.' });
+  }
+});
+
+app.get('/api/bookings', requireAuth, async (req, res) => {
+  try {
+    const bookings = await all(`
+      SELECT b.*, v.name AS vehicle_name
+      FROM bookings b
+      INNER JOIN vehicles v ON v.id = b.vehicle_id
+      WHERE b.user_id = ?
+      ORDER BY b.created_at DESC
+    `, [req.session.user.id]);
+    res.json(bookings);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to load bookings.' });
+  }
+});
+
+app.post('/api/bookings', requireAuth, async (req, res) => {
+  const { vehicleId, pickupDate, returnDate, total } = req.body;
+
+  if (!vehicleId || !pickupDate || !returnDate || !total) {
+    return res.status(400).json({ message: 'Please provide a vehicle, dates, and total.' });
+  }
+
+  try {
+    const vehicle = await get('SELECT * FROM vehicles WHERE id = ?', [Number(vehicleId)]);
+    if (!vehicle) {
+      return res.status(404).json({ message: 'Vehicle not found.' });
+    }
+
+    const bookingResult = await run(`
+      INSERT INTO bookings (user_id, vehicle_id, pickup_date, return_date, total, status)
+      VALUES (?, ?, ?, ?, ?, 'Upcoming')
+    `, [req.session.user.id, vehicle.id, pickupDate, returnDate, Number(total)]);
+
+    const booking = await get('SELECT * FROM bookings WHERE id = ?', [bookingResult.id]);
+    return res.status(201).json({ booking, vehicle });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Unable to create booking.' });
+  }
+});
+
+app.post('/api/payments', requireAuth, async (req, res) => {
+  const { bookingId, amount } = req.body;
+
+  if (!bookingId || !amount) {
+    return res.status(400).json({ message: 'Booking and amount are required.' });
+  }
+
+  try {
+    const booking = await get('SELECT * FROM bookings WHERE id = ? AND user_id = ?', [Number(bookingId), req.session.user.id]);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found.' });
+    }
+
+    await run('UPDATE bookings SET status = ? WHERE id = ?', ['Confirmed', booking.id]);
+    const payment = await run('INSERT INTO payments (user_id, booking_id, amount, status) VALUES (?, ?, ?, ?)', [req.session.user.id, booking.id, Number(amount), 'Paid']);
+    return res.status(201).json({ paymentId: payment.id, bookingId: booking.id, amount: Number(amount) });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Payment failed.' });
+  }
+});
+
+app.get('/api/admin/metrics', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const users = await all('SELECT COUNT(*) AS total FROM users');
+    const totalRevenue = await get('SELECT COALESCE(SUM(total), 0) AS total FROM bookings');
+    const upcomingBookings = await get('SELECT COUNT(*) AS total FROM bookings WHERE status = ?', ['Upcoming']);
+    const bookings = await all(`
+      SELECT b.*, u.name AS customer_name, v.name AS vehicle_name
+      FROM bookings b
+      INNER JOIN users u ON u.id = b.user_id
+      INNER JOIN vehicles v ON v.id = b.vehicle_id
+      ORDER BY b.created_at DESC
+    `);
+
+    res.json({
+      metrics: {
+        activeUsers: users[0]?.total || 0,
+        totalRevenue: Number(totalRevenue?.total || 0),
+        upcomingBookings: Number(upcomingBookings?.total || 0)
+      },
+      bookings
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Unable to load metrics.' });
+  }
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+async function startServer() {
+  await initializeDatabase();
+  app.listen(port, () => {
+    console.log(`DriveNow app running at http://localhost:${port}`);
+  });
+}
+
+startServer().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});

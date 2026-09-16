@@ -1,729 +1,199 @@
-* {
-  box-sizing: border-box;
-}
-
-:root {
-  --bg: #eff5ff;
-  --bg-deep: #dfeaff;
-  --panel: #ffffff;
-  --panel-soft: #f4f7ff;
-  --primary: #2759f4;
-  --primary-strong: #163fc6;
-  --accent: #e9f8f3;
-  --accent-strong: #1ba973;
-  --text: #152235;
-  --muted: #6d7d96;
-  --line: #dfe7f3;
-  --warning: #ffb260;
-  --shadow: 0 18px 45px rgba(16, 33, 60, 0.16);
-}
-
-html, body {
-  margin: 0;
-  min-height: 100%;
-  background: linear-gradient(180deg, #edf4ff 0%, #f9fbff 100%);
-  font-family: 'Inter', sans-serif;
-  color: var(--text);
-}
-
-button, input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.auth-screen,
-.app-shell {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 25px 12px;
-}
-
-.auth-card {
-  width: min(100%, 420px);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(167, 185, 216, 0.35);
-  border-radius: 28px;
-  padding: 28px 22px;
-  box-shadow: var(--shadow);
-}
-
-.brand-wrap {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-.brand-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--primary), #8bb0ff);
-  color: white;
-  font-weight: 800;
-  font-size: 1.5rem;
-}
-
-.brand-wrap h1 {
-  margin: 0;
-  font-size: 2rem;
-  letter-spacing: -0.06em;
-}
-
-.eyebrow {
-  margin: 0 0 6px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.62rem;
-  font-weight: 700;
-}
-
-.auth-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.toggle-button {
-  border: 1px solid var(--line);
-  background: white;
-  color: var(--muted);
-  border-radius: 10px;
-  padding: 12px;
-  font-weight: 700;
-}
-
-.toggle-button.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-
-.auth-form {
-  display: grid;
-  gap: 14px;
-}
-
-.auth-form label,
-#booking-form label {
-  display: grid;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.auth-form input,
-#booking-form input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--panel-soft);
-  color: var(--text);
-}
-
-.primary-btn,
-.cta-btn,
-.promo-btn,
-.select-btn,
-.small-btn {
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), #79a7ff);
-  color: white;
-  font-weight: 700;
-}
-
-.primary-btn,
-.cta-btn {
-  padding: 12px 16px;
-}
-
-.phone-frame {
-  width: min(100%, 420px);
-  min-height: 840px;
-  background: linear-gradient(180deg, #f7faff 0%, #f3f7ff 100%);
-  border: 1px solid rgba(138, 160, 196, 0.35);
-  border-radius: 32px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  position: relative;
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 22px 18px 14px;
-}
-
-.app-header h1 {
-  margin: 0;
-  font-size: 2rem;
-  letter-spacing: -0.06em;
-}
-
-.logout-btn {
-  border: 1px solid var(--line);
-  background: white;
-  color: var(--text);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-weight: 700;
-}
-
-.top-tabs {
-  display: flex;
-  gap: 8px;
-  padding: 0 18px 18px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.top-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.tab {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: white;
-  color: var(--muted);
-  padding: 9px 14px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.tab.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 18px 18px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: white;
-}
-
-.search-box input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 0.9rem;
-  color: var(--text);
-  outline: none;
-}
-
-.search-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: var(--panel-soft);
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.screen {
-  display: none;
-  padding: 0 18px 96px;
-}
-
-.screen.active {
-  display: block;
-}
-
-.promo-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 16px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #dfeeff 0%, #ebf5ff 50%, #fff3d9 100%);
-  border: 1px solid rgba(116, 154, 219, 0.25);
-}
-
-.promo-tag {
-  margin: 0 0 8px;
-  color: var(--primary-strong);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-
-.promo-card h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  letter-spacing: -0.05em;
-}
-
-.promo-btn {
-  padding: 10px 14px;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin: 26px 0 14px;
-}
-
-.section-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.text-btn {
-  border: none;
-  background: transparent;
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.vehicle-list,
-.booking-list {
-  display: grid;
-  gap: 14px;
-}
-
-.vehicle-card {
-  display: grid;
-  grid-template-columns: 84px 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 12px 12px 10px;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: 0 8px 18px rgba(18, 30, 54, 0.04);
-}
-
-.vehicle-emoji {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #eaf2ff, #f3f8ff);
-  font-size: 2.4rem;
-}
-
-.vehicle-main {
-  display: grid;
-  gap: 6px;
-}
-
-.vehicle-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.vehicle-head h4 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.field-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 8px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--accent-strong);
-  font-size: 0.64rem;
-  font-weight: 700;
-}
-
-.vehicle-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.vehicle-price {
-  display: grid;
-  justify-items: end;
-  gap: 8px;
-}
-
-.price-value {
-  font-size: 1.3rem;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-}
-
-.price-value small {
-  font-size: 0.7rem;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.select-btn,
-.small-btn {
-  padding: 9px 12px;
-  font-size: 0.76rem;
-}
-
-.trip-card,
-.saved-item,
-.profile-card,
-.settings-list,
-.metric-card,
-.admin-list {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-}
-
-.trip-card {
-  padding: 16px;
-  margin-bottom: 14px;
-}
-
-.trip-topline {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.trip-topline h4 {
-  margin: 6px 0 0;
-}
-
-.trip-status {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--accent-strong);
-  font-weight: 700;
-}
-
-.trip-status.muted {
-  color: var(--muted);
-}
-
-.trip-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 8px;
-  border-radius: 999px;
-  background: #eef4ff;
-  color: var(--primary-strong);
-  font-size: 0.64rem;
-  font-weight: 700;
-}
-
-.trip-badge.alt {
-  background: #eef9f4;
-  color: var(--accent-strong);
-}
-
-.trip-details {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: 0.76rem;
-}
-
-.trip-price {
-  margin-top: 16px;
-  font-weight: 700;
-}
-
-.saved-list,
-.settings-list {
-  display: grid;
-  gap: 12px;
-}
-
-.saved-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-}
-
-.saved-icon {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  background: var(--panel-soft);
-  font-size: 1.5rem;
-}
-
-.saved-item div:nth-child(2) {
-  flex: 1;
-  display: grid;
-  gap: 3px;
-}
-
-.saved-item strong {
-  font-size: 0.96rem;
-}
-
-.saved-item span {
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.profile-card {
-  padding: 18px;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.profile-avatar {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--primary), #83a4ff);
-  color: white;
-  font-weight: 700;
-}
-
-.profile-header h3 {
-  margin: 0;
-}
-
-.profile-header span {
-  display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.profile-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 24px;
-}
-
-.profile-stats div {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 14px 10px;
-  border-radius: 14px;
-  background: var(--panel-soft);
-}
-
-.profile-stats strong {
-  font-size: 1.2rem;
-}
-
-.profile-stats span {
-  color: var(--muted);
-  font-size: 0.7rem;
-}
-
-.settings-list {
-  margin-top: 18px;
-  padding: 8px;
-}
-
-.setting-item {
-  width: 100%;
-  padding: 14px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 12px;
-  text-align: left;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.setting-item:hover {
-  background: var(--panel-soft);
-}
-
-.admin-panel {
-  padding-bottom: 90px;
-}
-
-.admin-metrics {
-  display: grid;
-  gap: 10px;
-  margin: 18px 0;
-}
-
-.metric-card {
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.metric-card span {
-  color: var(--muted);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.metric-card strong {
-  font-size: 1.3rem;
-}
-
-.admin-list h4 {
-  margin: 0 0 12px;
-}
-
-.admin-list-item {
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  margin-bottom: 10px;
-  background: white;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.bottom-nav {
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 18px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  padding: 12px 10px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid var(--line);
-  box-shadow: 0 -8px 18px rgba(21, 32, 52, 0.06);
-  backdrop-filter: blur(10px);
-}
-
-.nav-button {
-  display: grid;
-  justify-items: center;
-  gap: 5px;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  padding: 6px 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-.nav-button.active {
-  color: var(--primary);
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(14, 23, 35, 0.45);
-  padding: 16px;
-  z-index: 20;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-card {
-  position: relative;
-  width: min(100%, 340px);
-  background: white;
-  border-radius: 24px;
-  padding: 24px 18px 18px;
-  box-shadow: var(--shadow);
-}
-
-.close-btn {
-  position: absolute;
-  right: 14px;
-  top: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: none;
-  background: #eef3ff;
-  color: var(--text);
-  font-size: 1.2rem;
-}
-
-.modal-card h3 {
-  margin: 0 0 16px;
-  font-size: 1.5rem;
-}
-
-.checkout-details {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.checkout-details div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.checkout-details strong {
-  color: var(--text);
-}
-
-#booking-form {
-  display: grid;
-  gap: 12px;
-}
-
-@media (min-width: 700px) {
-  .auth-screen,
-  .app-shell {
-    padding: 35px 20px;
-  }
- 
-  .phone-frame {
-    min-height: 860px;
-  }
-}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DriveNow | Premium Car Hire</title>
+    <meta name="description" content="DriveNow offers premium car hire, luxury vehicles, flexible booking, and fast payments." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container navshell">
+        <div class="brand-wrap">
+          <div class="brand-mark">D</div>
+          <div>
+            <div class="brand-name">DriveNow</div>
+            <div class="brand-tag">Premium mobility</div>
+          </div>
+        </div>
+        <nav class="main-nav">
+          <a href="#fleet">Fleet</a>
+          <a href="#booking">Book</a>
+          <a href="#about">Why us</a>
+          <a href="#admin">Admin</a>
+        </nav>
+        <div class="account-actions">
+          <button class="secondary-btn" id="loginToggle">Login</button>
+          <button class="primary-btn" id="signupToggle">Sign up</button>
+          <button class="ghost-btn hidden" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">Drive smarter</span>
+            <h1>Find your next trip in a premium car.</h1>
+            <p>
+              Flexible daily, weekly, and long-stay rentals designed for business travel, family trips, and city escapes.
+            </p>
+            <div class="cta-row">
+              <a class="primary-btn" href="#booking">Book now</a>
+              <a class="secondary-btn light" href="#fleet">Explore fleet</a>
+            </div>
+            <ul class="hero-stats">
+              <li><strong>4.9/5</strong><span>Customer rating</span></li>
+              <li><strong>24/7</strong><span>Support</span></li>
+              <li><strong>1200+</strong><span>Trips booked</span></li>
+            </ul>
+          </div>
+          <div class="hero-card">
+            <div class="mini-glass">
+              <div>
+                <span>From</span>
+                <strong id="heroRate">$89/day</strong>
+              </div>
+              <div class="route-pills"><span>Airport</span><span>City</span><span>Weekend</span></div>
+            </div>
+            <div class="vehicle-showcase">
+              <div class="vehicle-icon">🚙</div>
+              <div class="vehicle-meta">
+                <span>Featured</span>
+                <h3>BMW X5</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="analytics container" id="about">
+        <div class="analytics-card">
+          <span>Convenience</span>
+          <strong>Instant booking</strong>
+        </div>
+        <div class="analytics-card">
+          <span>Care</span>
+          <strong>Full insurance</strong>
+        </div>
+        <div class="analytics-card">
+          <span>Speed</span>
+          <strong>Contactless pickup</strong>
+        </div>
+        <div class="analytics-card">
+          <span>Support</span>
+          <strong>24/7 assistance</strong>
+        </div>
+      </section>
+
+      <section class="fleet container" id="fleet">
+        <div class="section-heading">
+          <span class="eyebrow">Fleet</span>
+          <h2>Pick the right ride</h2>
+        </div>
+        <div class="vehicle-grid" id="vehicleGrid"></div>
+      </section>
+
+      <section class="booking container" id="booking">
+        <div class="section-heading">
+          <span class="eyebrow">booking</span>
+          <h2>Reserve your vehicle</h2>
+        </div>
+        <div class="booking-grid">
+          <form id="bookingForm" class="booking-card">
+            <div class="form-row">
+              <label>
+                Choose car
+                <select id="vehicleSelect" required></select>
+              </label>
+            </div>
+            <div class="form-row dual">
+              <label>
+                Pickup date
+                <input type="date" id="pickupDate" required />
+              </label>
+              <label>
+                Return date
+                <input type="date" id="returnDate" required />
+              </label>
+            </div>
+            <div class="summary-box">
+              <span>Estimated total</span>
+              <strong id="bookingTotal">$0</strong>
+            </div>
+            <button type="submit" class="primary-btn wide">Confirm booking</button>
+          </form>
+
+          <aside class="booking-card history-panel">
+            <h3>Your bookings</h3>
+            <div id="bookingsList" class="history-list">
+              <p class="empty-state">Sign in to view your bookings.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="admin-section container hidden" id="admin">
+        <div class="section-heading">
+          <span class="eyebrow">admin</span>
+          <h2>Operations overview</h2>
+        </div>
+        <div class="metrics-grid" id="metricsGrid"></div>
+        <div class="admin-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Vehicle</th>
+                <th>Pickup</th>
+                <th>Return</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal hidden" id="authModal">
+      <div class="modal-panel">
+        <button class="close-btn" id="closeModal">×</button>
+        <div class="auth-tabs">
+          <button class="tab-btn active" data-mode="login">Login</button>
+          <button class="tab-btn" data-mode="signup">Sign up</button>
+        </div>
+
+        <form id="authForm">
+          <div class="form-row hidden" id="nameRow">
+            <label>
+              Full name
+              <input type="text" id="nameInput" placeholder="Jamie Smith" />
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Email
+              <input type="email" id="emailInput" placeholder="you@example.com" required />
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Password
+              <input type="password" id="passwordInput" placeholder="At least 6 characters" required />
+            </label>
+          </div>
+          <button type="submit" class="primary-btn wide" id="authSubmit">Login</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
