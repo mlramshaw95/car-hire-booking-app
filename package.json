@@ -1,26 +1,17 @@
 {
-  "name": "drive-now-app",
-  "version": "2.0.0",
-  "description": "Full-stack car hire app with login, bookings, payments, and admin dashboard",
+  "name": "drive-now-car-hire",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Functional mobile-first car hire booking website",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": [
-    "car-hire",
-    "booking",
-    "express",
-    "sqlite",
-    "mobile-app"
-  ],
-  "author": "mlramshaw95",
-  "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "express": "^4.19.2",
-    "express-session": "^1.18.0",
-    "sqlite3": "^5.1.7"
+    "express-session": "^1.18.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
