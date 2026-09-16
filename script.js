@@ -1,10 +1,4 @@
-const vehicles = [
-  { id: 1, name: 'BMW X5', type: 'SUV', fuel: 'Hybrid', seats: 5, rate: 98, icon: '🚙', badge: 'Popular' },
-  { id: 2, name: 'Mercedes C-Class', type: 'Luxury', fuel: 'Diesel', seats: 4, rate: 112, icon: '🏎️', badge: 'Luxury' },
-  { id: 3, name: 'Tesla Model 3', type: 'Electric', fuel: 'Electric', seats: 5, rate: 89, icon: '⚡', badge: 'Eco' },
-  { id: 4, name: 'VW Touran', type: 'Family', fuel: 'Petrol', seats: 7, rate: 74, icon: '🚐', badge: 'Family' },
-];
-
+const vehicles = [];
 const vehicleList = document.getElementById('vehicle-list');
 const navButtons = document.querySelectorAll('.nav-button');
 const screens = document.querySelectorAll('.screen');
@@ -12,9 +6,36 @@ const tabs = document.querySelectorAll('.tab');
 const checkoutModal = document.getElementById('checkout-modal');
 const closeModal = document.getElementById('close-modal');
 const bookingForm = document.getElementById('booking-form');
+const tripList = document.querySelector('.screen[data-screen="bookings"]');
+const recentBookings = [];
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(value);
+}
+
+async function loadVehicles() {
+  try {
+    const response = await fetch('/api/vehicles');
+    if (!response.ok) throw new Error('Could not load vehicles');
+    const data = await response.json();
+    vehicles.splice(0, vehicles.length, ...data);
+    renderVehicles();
+  } catch (error) {
+    console.error(error);
+    alert('Unable to load vehicles from the server.');
+  }
+}
+
+async function loadBookings() {
+  try {
+    const response = await fetch('/api/bookings');
+    if (!response.ok) throw new Error('Could not load bookings');
+    const data = await response.json();
+    recentBookings.splice(0, recentBookings.length, ...data);
+    renderBookings();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function renderVehicles(filter = 'Popular') {
@@ -47,11 +68,47 @@ function renderVehicles(filter = 'Popular') {
       const selected = vehicles.find(vehicle => vehicle.id === id);
       if (!selected) return;
       document.querySelector('.modal-card h3').textContent = `Reserve ${selected.name}`;
-      document.querySelector('.checkout-details strong:nth-of-type(3)').textContent = formatCurrency(selected.rate * 4);
+      const total = selected.rate * 4;
+      const totalEl = document.querySelector('.checkout-details strong:last-of-type');
+      if (totalEl) totalEl.textContent = formatCurrency(total);
       checkoutModal.classList.remove('hidden');
       checkoutModal.setAttribute('aria-hidden', 'false');
+      checkoutModal.dataset.vehicleId = String(selected.id);
+      checkoutModal.dataset.vehicleName = selected.name;
+      checkoutModal.dataset.vehicleRate = String(selected.rate);
     });
   });
+}
+
+function renderBookings() {
+  const cards = recentBookings.slice(0, 3).map(booking => `
+    <div class="trip-card ${booking.status === 'Upcoming' ? 'active-trip' : ''}">
+      <div class="trip-topline">
+        <div>
+          <span class="trip-status ${booking.status === 'Completed' ? 'muted' : ''}">${booking.status}</span>
+          <h4>${booking.pickup}</h4>
+        </div>
+        <span class="trip-badge ${booking.status === 'Completed' ? 'alt' : ''}">${booking.vehicle}</span>
+      </div>
+      <div class="trip-details">
+        <span>Reservation</span>
+        <span>${booking.customer}</span>
+      </div>
+      <div class="trip-price">${formatCurrency(booking.total)} total</div>
+    </div>
+  `).join('');
+
+  const bookingsScreen = document.querySelector('.screen[data-screen="bookings"]');
+  if (bookingsScreen) {
+    const tripCards = bookingsScreen.querySelectorAll('.trip-card');
+    if (tripCards.length) {
+      tripCards.forEach(card => card.remove());
+    }
+    const header = bookingsScreen.querySelector('.section-header');
+    if (header) {
+      header.insertAdjacentHTML('afterend', cards);
+    }
+  }
 }
 
 navButtons.forEach((button) => {
@@ -85,11 +142,42 @@ checkoutModal.addEventListener('click', (event) => {
   }
 });
 
-bookingForm.addEventListener('submit', (event) => {
+bookingForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  checkoutModal.classList.add('hidden');
-  checkoutModal.setAttribute('aria-hidden', 'true');
-  alert('Booking reserved successfully. Your confirmation has been sent by email.');
+
+  const formData = new FormData(bookingForm);
+  const payload = {
+    fullName: formData.get('fullName') || 'Jordan Doe',
+    email: formData.get('email') || 'jordan@example.com',
+    licence: formData.get('licence') || 'MANC-234-789',
+    vehicleName: checkoutModal.dataset.vehicleName || 'BMW X5',
+    pickup: 'Manchester Airport',
+    total: Number(checkoutModal.dataset.vehicleRate || 98) * 4,
+    status: 'Upcoming',
+  };
+
+  try {
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Booking failed');
+    }
+
+    checkoutModal.classList.add('hidden');
+    checkoutModal.setAttribute('aria-hidden', 'true');
+    bookingForm.reset();
+    await loadBookings();
+    alert('Booking reserved successfully. Your confirmation has been sent by email.');
+  } catch (error) {
+    console.error(error);
+    alert(error.message || 'Unable to complete booking.');
+  }
 });
 
-renderVehicles();
+loadVehicles();
+loadBookings();
