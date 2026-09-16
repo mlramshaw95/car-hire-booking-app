@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DriveNow Rentals</title>
+    <meta
+      name="description"
+      content="Mobile-first car hire booking app for browsing vehicles, selecting dates, and managing bookings."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">D</div>
+          <div>
+            <strong>DriveNow</strong>
+            <span>Rentals</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-item active" type="button">
+            <span>🏠</span>
+            Dashboard
+          </button>
+          <button class="nav-item" type="button">
+            <span>🚗</span>
+            Fleet
+          </button>
+          <button class="nav-item" type="button">
+            <span>📅</span>
+            Bookings
+          </button>
+          <button class="nav-item" type="button">
+            <span>📈</span>
+            Analytics
+          </button>
+          <button class="nav-item" type="button">
+            <span>⚙️</span>
+            Settings
+          </button>
+        </nav>
+
+        <div class="sidebar-card">
+          <p class="eyebrow">This week</p>
+          <h3>12 bookings</h3>
+          <div class="mini-metrics">
+            <span><strong>84%</strong> On time</span>
+            <span><strong>4.8</strong> Avg rating</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Good morning</p>
+            <h1>Book your next drive</h1>
+          </div>
+          <button class="primary-button" type="button">+ New booking</button>
+        </header>
+
+        <section class="hero-card">
+          <div>
+            <p class="eyebrow dark">Instant booking</p>
+            <h2>Find a premium ride in minutes</h2>
+          </div>
+          <div class="hero-badges">
+            <span>⚡ Instant approval</span>
+            <span>🛡️ Insurance included</span>
+          </div>
+        </section>
+
+        <section class="search-panel">
+          <div class="field">
+            <label for="location">Pickup location</label>
+            <input id="location" type="text" value="Manchester Airport" />
+          </div>
+          <div class="field">
+            <label for="pickup-date">Pickup date</label>
+            <input id="pickup-date" type="date" value="2026-09-17" />
+          </div>
+          <div class="field">
+            <label for="return-date">Return date</label>
+            <input id="return-date" type="date" value="2026-09-21" />
+          </div>
+          <div class="field">
+            <label for="vehicle-type">Vehicle type</label>
+            <select id="vehicle-type">
+              <option value="all">All vehicles</option>
+              <option value="SUV">SUV</option>
+              <option value="Luxury">Luxury</option>
+              <option value="Electric">Electric</option>
+              <option value="Family">Family</option>
+            </select>
+          </div>
+          <button id="search-button" class="primary-button" type="button">Search cars</button>
+        </section>
+
+        <section class="stats-grid" aria-label="Key stats">
+          <div class="stat-box accent">
+            <span class="stat-label">Available now</span>
+            <strong>128</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">New bookings</span>
+            <strong>32</strong>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Revenue</span>
+            <strong>£18.4k</strong>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <div class="fleet-panel">
+            <div class="section-header">
+              <div>
+                <p class="eyebrow">Our fleet</p>
+                <h3>Popular vehicles</h3>
+              </div>
+              <button class="ghost-button" type="button">View all</button>
+            </div>
+
+            <div id="car-list" class="car-list" aria-live="polite"></div>
+          </div>
+
+          <aside class="booking-summary">
+            <div class="summary-header">
+              <p class="eyebrow">Reservation</p>
+              <h3>Booking summary</h3>
+            </div>
+
+            <div class="booking-card" id="booking-card">
+              <div class="booking-vehicle">
+                <span class="car-badge" id="summary-badge">SUV</span>
+                <h4 id="summary-title">BMW X5</h4>
+              </div>
+
+              <div class="detail-row">
+                <span>Pickup</span>
+                <strong id="summary-pickup">Manchester Airport</strong>
+              </div>
+              <div class="detail-row">
+                <span>Dates</span>
+                <strong id="summary-dates">17 Sep – 21 Sep</strong>
+              </div>
+              <div class="detail-row">
+                <span>Daily rate</span>
+                <strong id="summary-rate">£98/day</strong>
+              </div>
+              <div class="detail-row total-row">
+                <span>Total</span>
+                <strong id="summary-total">£392</strong>
+              </div>
+
+              <button id="book-button" class="primary-button full-width" type="button">Confirm booking</button>
+            </div>
+
+            <div class="recent-bookings">
+              <p class="eyebrow">Recent</p>
+              <ul id="recent-bookings-list"></ul>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div id="booking-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button id="close-modal" class="close-button" type="button" aria-label="Close booking modal">×</button>
+        <p class="eyebrow">Complete your booking</p>
+        <h3 id="modal-title">Reserve your vehicle</h3>
+
+        <form id="booking-form">
+          <label>
+            Full name
+            <input name="fullName" type="text" placeholder="Your name" required />
+          </label>
+          <label>
+            Email address
+            <input name="email" type="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Driver licence number
+            <input name="licence" type="text" placeholder="Licence number" required />
+          </label>
+          <label>
+            Extra request
+            <textarea name="notes" rows="3" placeholder="Child seat, add-on insurance, etc."></textarea>
+          </label>
+          <button class="primary-button full-width" type="submit">Pay deposit</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
